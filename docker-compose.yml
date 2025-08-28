@@ -1,0 +1,37 @@
+services:
+  app:
+    build: .
+    container_name: backend-app
+    # Nạp biến môi trường runtime (DB_URI, JWT_SECRET, ...)
+    env_file:
+      - .env
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2
+    container_name: caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - app
+    restart: unless-stopped
+
+# Nếu bạn chưa có DB ngoài, có thể mở service MongoDB bên dưới:
+#  mongo:
+#    image: mongo:7
+#    container_name: mongo
+#    restart: unless-stopped
+#    ports:
+#      - "27017:27017"
+#    volumes:
+#      - mongo_data:/data/db
+
+volumes:
+  caddy_data:
+  caddy_config:
+  # mongo_data:
